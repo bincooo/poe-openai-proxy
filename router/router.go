@@ -146,7 +146,7 @@ forLoop:
 			break forLoop
 		case d := <-channel:
 			ticker.Reset(timeout)
-			util.Logger.Debug("======接收文本======\n", d)
+			// util.Logger.Debug("======接收文本======\n", d)
 			createSSEResponse(d, false)
 			if d == "[DONE]" {
 				break forLoop
