@@ -2,26 +2,24 @@ package router
 
 import (
 	"encoding/json"
-	"io"
-	"net/http"
-	"log"
-	"time"
+	"github.com/gin-gonic/gin"
 	"github.com/juzeon/poe-openai-proxy/conf"
 	"github.com/juzeon/poe-openai-proxy/poe"
 	"github.com/juzeon/poe-openai-proxy/util"
-	"github.com/gin-gonic/gin"
-
+	"io"
+	"log"
+	"net/http"
+	"time"
 )
 
 func Setup(engine *gin.Engine) {
-
 
 	//engine.ForwardedByClientIP = true
 	//engine.SetTrustedProxies([]string{"*"})
 
 	getModels := func(c *gin.Context) {
 		SetCORS(c)
-		if c.Request.Header.Get("Authorization") != "Bearer " + conf.Conf.AuthKey {
+		if c.Request.Header.Get("Authorization") != "Bearer "+conf.Conf.AuthKey {
 			c.JSON(401, "unauthorized")
 			c.Abort()
 			return
@@ -34,7 +32,7 @@ func Setup(engine *gin.Engine) {
 
 	postCompletions := func(c *gin.Context) {
 		SetCORS(c)
-		if c.Request.Header.Get("Authorization") != "Bearer " + conf.Conf.AuthKey {
+		if c.Request.Header.Get("Authorization") != "Bearer "+conf.Conf.AuthKey {
 			c.JSON(401, "unauthorized")
 			c.Abort()
 			return
@@ -73,7 +71,7 @@ func Setup(engine *gin.Engine) {
 
 	optionsCompletions := func(c *gin.Context) {
 		SetCORS(c)
-		if c.Request.Header.Get("Authorization") != "Bearer " + conf.Conf.AuthKey {
+		if c.Request.Header.Get("Authorization") != "Bearer "+conf.Conf.AuthKey {
 			c.JSON(401, "unauthorized")
 			c.Abort()
 			return
@@ -84,7 +82,6 @@ func Setup(engine *gin.Engine) {
 	engine.OPTIONS("/chat/completions", optionsCompletions)
 	engine.OPTIONS("/v1/chat/completions", optionsCompletions)
 }
-
 
 func Stream(c *gin.Context, req poe.CompletionRequest, client *poe.Client) {
 	c.Writer.Header().Set("Content-Type", "text/event-stream")
@@ -149,6 +146,7 @@ forLoop:
 			break forLoop
 		case d := <-channel:
 			ticker.Reset(timeout)
+			util.Logger.Debug("======接收文本======\n", d)
 			createSSEResponse(d, false)
 			if d == "[DONE]" {
 				break forLoop
